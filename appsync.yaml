@@ -1,0 +1,65 @@
+Resources:
+  graphQLApi:
+    Type: AWS::AppSync::GraphQLApi
+    Properties:
+      Name: GraphQLDemoApi
+      AuthenticationType: API_KEY
+  graphQLSchema: 
+    Type: AWS::AppSync::GraphQLSchema
+    Properties:
+      ApiId: !GetAtt graphQLApi.ApiId
+      Definition: |
+        type Mutation {
+          sendMessage(msg: String): Message!
+        }
+        type Query {
+          dummy(param: String): String
+        }
+        type Subscription {
+          subscribeToMessages: Message
+          @aws_subscribe(mutations: ["sendMessage"])
+        }
+        type Message {
+          message: String
+        }
+        schema {
+          query: Query
+          mutation: Mutation
+          subscription: Subscription
+        }
+  noneDataSource:
+    Type: AWS::AppSync::DataSource
+    Properties: 
+      ApiId: !GetAtt graphQLApi.ApiId
+      Name: NoneDataSource
+      Type: "NONE"
+
+  apiKey: 
+    Type: AWS::AppSync::ApiKey
+    Properties:
+      ApiId: !GetAtt graphQLApi.ApiId
+
+  sendMessageResolver: 
+    Type: AWS::AppSync::Resolver
+    Properties:
+      ApiId: !GetAtt graphQLApi.ApiId
+      TypeName: Mutation
+      FieldName: sendMessage
+      DataSourceName: !GetAtt noneDataSource.Name
+      RequestMappingTemplate: |
+          {
+            "version": "2017-02-28",
+            "payload": {
+              "message": $util.toJson($context.arguments.msg)
+            }
+          }
+      ResponseMappingTemplate: "$util.toJson($ctx.result)"
+
+
+Outputs:
+  RealtimeApiUrl:
+    Value: !GetAtt graphQLApi.RealtimeUrl
+  GraphQLUrl: 
+    Value: !GetAtt graphQLApi.GraphQLUrl
+  ApiKey:
+    Value: !GetAtt apiKey.ApiKey
