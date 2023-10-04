@@ -19,11 +19,10 @@
       </div>
     </div>
     <script>
-      const APPSYNC_HOST =
-        "7u4ltjtnardcpa6bwcyuwkorda.appsync-api.eu-north-1.amazonaws.com";
+      const APPSYNC_HOST = "xxxxx.appsync-api.eu-north-1.amazonaws.com";
       const APPSYNC_REALTIME_HOST =
-        "7u4ltjtnardcpa6bwcyuwkorda.appsync-realtime-api.eu-north-1.amazonaws.com";
-      const APPSYNC_API_KEY = "da2-i446laavnfdpne6k7y3v7imiry";
+        "xxxxx.appsync-realtime-api.eu-north-1.amazonaws.com";
+      const APPSYNC_API_KEY = "xxxxx";
 
       function encodeAppSyncCredentials() {
         const creds = {
@@ -108,7 +107,7 @@
             console.error(message);
             break;
           case "data":
-            console.log(message.payload.data.subscribeToMessages.message);
+            handleMessage(message.payload.data.subscribeToMessages.message);
             break;
         }
       });
